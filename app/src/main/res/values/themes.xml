@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.SBL" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/sbl_black</item>
+        <item name="android:statusBarColor">@color/sbl_black</item>
+        <item name="android:navigationBarColor">@color/sbl_black</item>
+        <item name="android:colorAccent">@color/sbl_red</item>
+    </style>
+</resources>

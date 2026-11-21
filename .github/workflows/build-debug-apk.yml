@@ -1,0 +1,76 @@
+name: Build Debug APK
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-debug-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: assembleDebug
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: JDK 17 einrichten
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Android SDK einrichten (Lizenzen werden akzeptiert)
+        uses: android-actions/setup-android@v3
+
+      - name: Gradle 8.7 einrichten
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+
+      - name: Versionen ausgeben
+        run: |
+          java -version
+          gradle --version
+
+      - name: Debug-APK bauen (assembleDebug)
+        run: gradle assembleDebug --stacktrace
+
+      - name: APK pruefen
+        run: |
+          APK=$(find app/build/outputs/apk/debug -name '*.apk' | head -n 1)
+          if [ -z "$APK" ]; then
+            echo "::error title=Keine APK gefunden::assembleDebug lief durch, aber app/build/outputs/apk/debug enthaelt keine APK."
+            exit 1
+          fi
+          echo "APK gefunden: $APK"
+          ls -lh "$APK"
+
+      - name: APK als Artifact hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: SBL-SUPER-BOOST-V2-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+
+      - name: Fehlerhinweis
+        if: failure()
+        run: |
+          echo "::error title=Build fehlgeschlagen::Die erste Kotlin-/Gradle-Fehlermeldung steht im Schritt 'Debug-APK bauen'. Der Build-Report liegt (falls vorhanden) als Artifact 'build-reports' vor."
+
+      - name: Build-Reports hochladen (nur bei Fehler)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-reports
+          path: |
+            app/build/reports
+            app/build/outputs/logs
+          if-no-files-found: ignore
