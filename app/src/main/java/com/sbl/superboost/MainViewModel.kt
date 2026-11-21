@@ -95,7 +95,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
 
     // ------------------------------------------------------------ Lautstärke
 
-    fun setVolume(percent: Int) {
+    fun updateVolume(percent: Int) {
         val v = percent.coerceIn(0, 200)
         if (v <= 100) {
             val idx = vc.setSystemPercent(v)
@@ -109,7 +109,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun stepVolume(delta: Int) = setVolume(volume + delta)
+    fun stepVolume(delta: Int) = updateVolume(volume + delta)
 
     /** Gleicht den Regler mit Änderungen über die Hardware-Tasten / das System-Panel ab. */
     fun syncFromSystem() {

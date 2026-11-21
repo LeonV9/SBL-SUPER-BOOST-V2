@@ -216,7 +216,7 @@ private fun VolumeCard(vm: MainViewModel) {
         }
         Slider(
             value = v.toFloat(),
-            onValueChange = { vm.setVolume(it.roundToInt()) },
+            onValueChange = { vm.updateVolume(it.roundToInt()) },
             valueRange = 0f..200f,
             colors = sliderColors()
         )
